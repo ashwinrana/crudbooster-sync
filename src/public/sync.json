@@ -1,0 +1,17 @@
+{
+    "cms_menu": {
+        "object": 1
+    },
+    "cms_menus_privileges": {
+        "object": 2
+    },
+    "cms_moduls": {
+        "object": 3
+    },
+    "cms_privileges": {
+        "object": 4
+    },
+    "cms_privileges_roles": {
+        "object": 5
+    }
+}

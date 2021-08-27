@@ -1,0 +1,33 @@
+{
+    "name": "ashwinrana/crudbooster-sync",
+    "description": "This package will help you to sync the role, privilege, generated modules, menu, and menu privilege from one crud booster to another crud booster project.",
+    "type": "library",
+    "license": "MIT",
+    "keywords":[
+        "laravel",
+        "crudbooster",
+        "sync",
+        "crudbooster-sync",
+        "menu",
+        "sync-menu"
+    ],
+    "authors": [
+        {
+            "name": "Ashwin Rana",
+            "email": "ashwinrana10@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Ashwinrana\\CrudboosterSync\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "\\Ashwinrana\\CrudboosterSync\\CrudboosterSyncServiceProvider"
+            ]
+        }
+    }
+}
