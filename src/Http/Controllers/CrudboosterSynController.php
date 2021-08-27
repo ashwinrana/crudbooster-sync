@@ -91,7 +91,7 @@ class CrudboosterSynController extends Controller
                     } else {
                         DB::insert('INSERT INTO cms_menus (id, name, type, path, color, icon, parent_id, is_active, is_dashboard, id_cms_privileges, sorting, created_at, updated_at )
                                         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', [
-                            $menu['id'], ['name'], $menu['type'], $menu['path'], $menu['color'], $menu['icon'], $menu['parent_id'], $menu['is_active'], $menu['is_dashboard'], $menu['id_cms_privileges'], $menu['sorting'], $menu['created_at'], Carbon::now()
+                            $menu['id'], $menu['name'], $menu['type'], $menu['path'], $menu['color'], $menu['icon'], $menu['parent_id'], $menu['is_active'], $menu['is_dashboard'], $menu['id_cms_privileges'], $menu['sorting'], $menu['created_at'], Carbon::now()
                         ]);
                     }
                 }
