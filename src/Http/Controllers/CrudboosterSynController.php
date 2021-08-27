@@ -66,120 +66,131 @@ class CrudboosterSynController extends Controller
                 array_diff($db_response['cms_privileges_roles'], $data['cms_privileges_roles'])) {
             }
 
-            //TODO Check if need to run this query or not.
-            foreach ($data['cms_menu'] as $menu) {
-                if (DB::table('cms_menus')->where('id', $menu['id'])->exists()) {
-                    DB::table('cms_menus')
-                        ->where('id', $menu['id'])
-                        ->update([
-                            'name' => $menu['name'],
-                            'type' => $menu['type'],
-                            'path' => $menu['path'],
-                            'color' => $menu['color'],
-                            'icon' => $menu['icon'],
-                            'parent_id' => $menu['parent_id'],
-                            'is_active' => $menu['is_active'],
-                            'is_dashboard' => $menu['is_dashboard'],
-                            'id_cms_privileges' => $menu['id_cms_privileges'],
-                            'sorting' => $menu['sorting'],
-                            'created_at' => $menu['created_at'],
-                            'updated_at' => Carbon::now()
-                        ]);
-                } else {
-                    DB::insert('INSERT INTO cms_menus (id, name, type, path, color, icon, parent_id, is_active, is_dashboard, id_cms_privileges, sorting, created_at, updated_at )
+            DB::beginTransaction();
+            try {
+
+                //TODO Check if need to run this query or not.
+                foreach ($data['cms_menu'] as $menu) {
+                    if (DB::table('cms_menus')->where('id', $menu['id'])->exists()) {
+                        DB::table('cms_menus')
+                            ->where('id', $menu['id'])
+                            ->update([
+                                'name' => $menu['name'],
+                                'type' => $menu['type'],
+                                'path' => $menu['path'],
+                                'color' => $menu['color'],
+                                'icon' => $menu['icon'],
+                                'parent_id' => $menu['parent_id'],
+                                'is_active' => $menu['is_active'],
+                                'is_dashboard' => $menu['is_dashboard'],
+                                'id_cms_privileges' => $menu['id_cms_privileges'],
+                                'sorting' => $menu['sorting'],
+                                'created_at' => $menu['created_at'],
+                                'updated_at' => Carbon::now()
+                            ]);
+                    } else {
+                        DB::insert('INSERT INTO cms_menus (id, name, type, path, color, icon, parent_id, is_active, is_dashboard, id_cms_privileges, sorting, created_at, updated_at )
                                         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', [
-                        $menu['id'], ['name'], $menu['type'], $menu['path'], $menu['color'], $menu['icon'], $menu['parent_id'], $menu['is_active'], $menu['is_dashboard'], $menu['id_cms_privileges'], $menu['sorting'], $menu['created_at'], Carbon::now()
-                    ]);
-                }
-            }
-
-            //TODO Check if need to run this query or not.
-            foreach ($data['cms_menus_privileges'] as $cms_menus_privilege) {
-                if (DB::table('cms_menus_privileges')->where('id', $cms_menus_privilege['id'])->exists()) {
-                    DB::table('cms_menus_privileges')
-                        ->where('id', $cms_menus_privilege['id'])
-                        ->update([
-                            'id_cms_menus' => $cms_menus_privilege['id_cms_menus'],
-                            'id_cms_privileges' => $cms_menus_privilege['id_cms_privileges']
+                            $menu['id'], ['name'], $menu['type'], $menu['path'], $menu['color'], $menu['icon'], $menu['parent_id'], $menu['is_active'], $menu['is_dashboard'], $menu['id_cms_privileges'], $menu['sorting'], $menu['created_at'], Carbon::now()
                         ]);
-                } else {
-                    DB::insert('INSERT INTO cms_menus_privileges (id, id_cms_menus, id_cms_privileges )
-                                        VALUES (?,?,?,?,?)', [
-                        $cms_menus_privilege['id'], $cms_menus_privilege['id_cms_menus'], $cms_menus_privilege['id_cms_privileges']
-                    ]);
+                    }
                 }
-            }
-        }
 
-        //TODO Check if need to run this query or not.
-        foreach ($data['cms_moduls'] as $cms_modul) {
-            if (DB::table('cms_moduls')->where('id', $cms_modul['id'])->exists()) {
-                DB::table('cms_moduls')
-                    ->where('id', $cms_modul['id'])
-                    ->update([
-                        'name' => $cms_modul['name'],
-                        'icon' => $cms_modul['icon'],
-                        'path' => $cms_modul['path'],
-                        'table_name' => $cms_modul['table_name'],
-                        'controller' => $cms_modul['controller'],
-                        'is_protected' => $cms_modul['is_protected'],
-                        'is_active' => $cms_modul['is_active'],
-                        'created_at' => $cms_modul['created_at'],
-                        'updated_at' => Carbon::now()
-                    ]);
-            } else {
-                DB::insert('INSERT INTO cms_moduls (id, name, icon, path, table_name, controller, is_protected, is_active, created_at, updated_at )
+                //TODO Check if need to run this query or not.
+                foreach ($data['cms_menus_privileges'] as $cms_menus_privilege) {
+                    if (DB::table('cms_menus_privileges')->where('id', $cms_menus_privilege['id'])->exists()) {
+                        DB::table('cms_menus_privileges')
+                            ->where('id', $cms_menus_privilege['id'])
+                            ->update([
+                                'id_cms_menus' => $cms_menus_privilege['id_cms_menus'],
+                                'id_cms_privileges' => $cms_menus_privilege['id_cms_privileges']
+                            ]);
+                    } else {
+                        DB::insert('INSERT INTO cms_menus_privileges (id, id_cms_menus, id_cms_privileges )
+                                        VALUES (?,?,?)', [
+                            $cms_menus_privilege['id'], $cms_menus_privilege['id_cms_menus'], $cms_menus_privilege['id_cms_privileges']
+                        ]);
+                    }
+                }
+
+                //TODO Check if need to run this query or not.
+                foreach ($data['cms_moduls'] as $cms_modul) {
+                    if (DB::table('cms_moduls')->where('id', $cms_modul['id'])->exists()) {
+                        DB::table('cms_moduls')
+                            ->where('id', $cms_modul['id'])
+                            ->update([
+                                'name' => $cms_modul['name'],
+                                'icon' => $cms_modul['icon'],
+                                'path' => $cms_modul['path'],
+                                'table_name' => $cms_modul['table_name'],
+                                'controller' => $cms_modul['controller'],
+                                'is_protected' => $cms_modul['is_protected'],
+                                'is_active' => $cms_modul['is_active'],
+                                'created_at' => $cms_modul['created_at'],
+                                'updated_at' => Carbon::now()
+                            ]);
+                    } else {
+                        DB::insert('INSERT INTO cms_moduls (id, name, icon, path, table_name, controller, is_protected, is_active, created_at, updated_at )
                                         VALUES (?,?,?,?,?,?,?,?,?,?)', [
-                    $cms_modul['id'], $cms_modul['name'], $cms_modul['icon'], $cms_modul['path'], $cms_modul['table_name'], $cms_modul['controller'], $cms_modul['is_protected'], $cms_modul['is_active'], $cms_modul['created_at'], Carbon::now()
-                ]);
-            }
-        }
+                            $cms_modul['id'], $cms_modul['name'], $cms_modul['icon'], $cms_modul['path'], $cms_modul['table_name'], $cms_modul['controller'], $cms_modul['is_protected'], $cms_modul['is_active'], $cms_modul['created_at'], Carbon::now()
+                        ]);
+                    }
+                }
 
-        //TODO Check if need to run this query or not.
-        foreach ($data['cms_privileges'] as $cms_privilege) {
-            if (DB::table('cms_privileges')->where('id', $cms_privilege['id'])->exists()) {
-                DB::table('cms_privileges')
-                    ->where('id', $cms_privilege['id'])
-                    ->update([
-                        'name' => $cms_privilege['name'],
-                        'is_superadmin' => $cms_privilege['is_superadmin'],
-                        'theme_color' => $cms_privilege['theme_color'],
-                        'created_at' => $cms_privilege['created_at'],
-                        'updated_at' => Carbon::now()
-                    ]);
-            } else {
-                DB::insert('INSERT INTO cms_privileges (id, name, is_superadmin, theme_color, created_at, updated_at )
+                //TODO Check if need to run this query or not.
+                foreach ($data['cms_privileges'] as $cms_privilege) {
+                    if (DB::table('cms_privileges')->where('id', $cms_privilege['id'])->exists()) {
+                        DB::table('cms_privileges')
+                            ->where('id', $cms_privilege['id'])
+                            ->update([
+                                'name' => $cms_privilege['name'],
+                                'is_superadmin' => $cms_privilege['is_superadmin'],
+                                'theme_color' => $cms_privilege['theme_color'],
+                                'created_at' => $cms_privilege['created_at'],
+                                'updated_at' => Carbon::now()
+                            ]);
+                    } else {
+                        DB::insert('INSERT INTO cms_privileges (id, name, is_superadmin, theme_color, created_at, updated_at )
                                         VALUES (?,?,?,?,?,?)', [
-                    $cms_privilege['id'], $cms_privilege['name'], $cms_privilege['is_superadmin'], $cms_privilege['theme_color'], $cms_privilege['created_at'], Carbon::now()
-                ]);
-            }
-        }
+                            $cms_privilege['id'], $cms_privilege['name'], $cms_privilege['is_superadmin'], $cms_privilege['theme_color'], $cms_privilege['created_at'], Carbon::now()
+                        ]);
+                    }
+                }
 
-        //TODO Check if need to run this query or not.
-        foreach ($data['cms_privileges_roles'] as $cms_privileges_role) {
-            if (DB::table('cms_privileges_roles')->where('id', $cms_privileges_role['id'])->exists()) {
-                DB::table('cms_privileges_roles')
-                    ->where('id', $cms_privileges_role['id'])
-                    ->update([
-                        'is_visible' => $cms_privileges_role['is_visible'],
-                        'is_create' => $cms_privileges_role['is_create'],
-                        'is_read' => $cms_privileges_role['is_read'],
-                        'is_edit' => $cms_privileges_role['is_edit'],
-                        'is_delete' => $cms_privileges_role['is_delete'],
-                        'id_cms_privileges' => $cms_privileges_role['id_cms_privileges'],
-                        'id_cms_moduls' => $cms_privileges_role['id_cms_moduls'],
-                        'created_at' => empty($cms_privileges_role['created_at']) ? $cms_privileges_role['created_at'] : Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-            } else {
-                DB::insert('INSERT INTO cms_moduls (id, is_visible, is_create, is_read, is_edit, is_delete, id_cms_privileges, id_cms_moduls, created_at, updated_at )
+                //TODO Check if need to run this query or not.
+                foreach ($data['cms_privileges_roles'] as $cms_privileges_role) {
+                    if (DB::table('cms_privileges_roles')->where('id', $cms_privileges_role['id'])->exists()) {
+                        DB::table('cms_privileges_roles')
+                            ->where('id', $cms_privileges_role['id'])
+                            ->update([
+                                'is_visible' => $cms_privileges_role['is_visible'],
+                                'is_create' => $cms_privileges_role['is_create'],
+                                'is_read' => $cms_privileges_role['is_read'],
+                                'is_edit' => $cms_privileges_role['is_edit'],
+                                'is_delete' => $cms_privileges_role['is_delete'],
+                                'id_cms_privileges' => $cms_privileges_role['id_cms_privileges'],
+                                'id_cms_moduls' => $cms_privileges_role['id_cms_moduls'],
+                                'created_at' => empty($cms_privileges_role['created_at']) ? $cms_privileges_role['created_at'] : Carbon::now(),
+                                'updated_at' => Carbon::now()
+                            ]);
+                    } else {
+                        DB::insert('INSERT INTO cms_privileges_roles (id, is_visible, is_create, is_read, is_edit, is_delete, id_cms_privileges, id_cms_moduls, created_at, updated_at )
                                         VALUES (?,?,?,?,?,?,?,?,?,?)', [
-                    $cms_privileges_role['id'], $cms_privileges_role['is_visible'], $cms_privileges_role['is_create'], $cms_privileges_role['is_read'], $cms_privileges_role['is_edit'], $cms_privileges_role['is_delete'], $cms_privileges_role['id_cms_privileges'], $cms_privileges_role['id_cms_moduls'], $cms_privileges_role['created_at'], Carbon::now()
-                ]);
+                            $cms_privileges_role['id'], $cms_privileges_role['is_visible'], $cms_privileges_role['is_create'], $cms_privileges_role['is_read'], $cms_privileges_role['is_edit'], $cms_privileges_role['is_delete'], $cms_privileges_role['id_cms_privileges'], $cms_privileges_role['id_cms_moduls'], $cms_privileges_role['created_at'], Carbon::now()
+                        ]);
+                    }
+                }
+                DB::commit();
+
+                return redirect()->route('crudboostersync')->with('message', 'Synced to database successfully');
+
+            } catch (\Exception $exception) {
+                DB::rollBack();
+
+                return redirect()->route('crudboostersync')->with('error', $exception->getMessage());
+
             }
         }
-
-        return redirect()->route('crudboostersync')->with('message', 'Synced to database successfully');
     }
 
     public function loadData()
