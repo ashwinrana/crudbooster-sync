@@ -10,11 +10,21 @@ use Illuminate\Support\Facades\Request;
 
 class CrudboosterSynController extends Controller
 {
+    public $file_path = '';
+
+    public function __construct($file_path = '')
+    {
+        $this->file_path = (!empty($file_path)) ? $file_path : public_path('vendor/crudboostersync/data/sync.json');
+    }
+
     public function index()
     {
-        $file = File::exists(public_path('vendor\crudboostersync\data\sync.json'));
+        if (!\crocodicstudio\crudbooster\helpers\CRUDBooster::isSuperadmin()) {
+            return abort(403, 'Unauthorized action.');
+        }
+        $file = File::exists($this->file_path);
         if ($file) {
-            $content = File::get(public_path('vendor\crudboostersync\data\sync.json'));
+            $content = File::get($this->file_path);
             $data = json_decode($content, true);
             $db_response = $this->loadData();
             if (count($db_response['cms_menu']) !== count($data['cms_menu']) ||
@@ -35,11 +45,14 @@ class CrudboosterSynController extends Controller
 
     public function syncToFile(Request $request)
     {
-        $file = File::exists(public_path('vendor\crudboostersync\data\sync.json'));
+        if (!\crocodicstudio\crudbooster\helpers\CRUDBooster::isSuperadmin()) {
+            return abort(403, 'Unauthorized action.');
+        }
+        $file = File::exists($this->file_path);
         if ($file) {
             $db_response = $this->loadData();
             try {
-                File::put(public_path('vendor\crudboostersync\data\sync.json'), json_encode($db_response));
+                File::put($this->file_path, json_encode($db_response));
 
                 return redirect()->route('crudboostersync')->with('message', 'Synced to file successfully');
 
@@ -54,9 +67,12 @@ class CrudboosterSynController extends Controller
 
     public function syncToDb(Request $request)
     {
-        $file = File::exists(public_path('vendor\crudboostersync\data\sync.json'));
+        if (!\crocodicstudio\crudbooster\helpers\CRUDBooster::isSuperadmin()) {
+            return abort(403, 'Unauthorized action.');
+        }
+        $file = File::exists($this->file_path);
         if ($file) {
-            $content = File::get(public_path('vendor\crudboostersync\data\sync.json'));
+            $content = File::get($this->file_path);
             $data = json_decode($content, true);
             $db_response = $this->loadData();
             if (array_diff($db_response['cms_menu'], $data['cms_menu']) ||
@@ -190,11 +206,16 @@ class CrudboosterSynController extends Controller
                 return redirect()->route('crudboostersync')->with('error', $exception->getMessage());
 
             }
+        } else {
+            return redirect()->route('crudboostersync')->with('message', 'File Not Found');
         }
     }
 
     public function loadData()
     {
+        if (!\crocodicstudio\crudbooster\helpers\CRUDBooster::isSuperadmin()) {
+            return abort(403, 'Unauthorized action.');
+        }
         $cms_menus_database = DB::table('cms_menus')->get();
         $cms_menu_json = [];
 

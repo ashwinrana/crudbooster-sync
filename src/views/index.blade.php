@@ -42,15 +42,42 @@
         <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
     </form>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function (event) {
             var syncToFile = document.getElementById("post-sync-to-file");
             document.getElementById("sync-to-file").addEventListener("click", function () {
-                syncToFile.submit();
+                swal({
+                    title: 'Are you sure?',
+                    text: "Once you sync to file it will replaced your existing file and cannot be revert!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Sync To file!'
+                }, function (result) {
+                    if (result) {
+                        event.preventDefault();
+                        syncToDb.submit();
+                    }
+                })
             });
             var syncToDb = document.getElementById("post-sync-to-db");
             document.getElementById("sync-to-db").addEventListener("click", function () {
-                syncToDb.submit();
+                swal({
+                    title: 'Are you sure?',
+                    text: "Once you sync to database it will replaced your existing database table and cannot be revert!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Sync To Database!'
+                }, function (result) {
+                    if (result) {
+                        event.preventDefault();
+                        syncToDb.submit();
+                    }
+                })
             });
         });
     </script>
