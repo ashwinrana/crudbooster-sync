@@ -58,7 +58,7 @@
                 }, function (result) {
                     if (result) {
                         event.preventDefault();
-                        syncToDb.submit();
+                        syncToFile.submit();
                     }
                 })
             });

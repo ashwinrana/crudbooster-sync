@@ -48,7 +48,7 @@ class CrudboosterSynController extends Controller
         if (!\crocodicstudio\crudbooster\helpers\CRUDBooster::isSuperadmin()) {
             return abort(403, 'Unauthorized action.');
         }
-        $file = File::exists($this->file_path);
+        $file = File::exists($this->file_path);;
         if ($file) {
             $db_response = $this->loadData();
             try {
@@ -71,6 +71,7 @@ class CrudboosterSynController extends Controller
             return abort(403, 'Unauthorized action.');
         }
         $file = File::exists($this->file_path);
+        $database_connection = (config('app.default') == null) ? env('DB_CONNECTION') : config('app.default');
         if ($file) {
             $content = File::get($this->file_path);
             $data = json_decode($content, true);
@@ -82,8 +83,8 @@ class CrudboosterSynController extends Controller
                 array_diff($db_response['cms_privileges_roles'], $data['cms_privileges_roles'])) {
             }
 
-            DB::beginTransaction();
             try {
+                DB::beginTransaction();
 
                 //TODO Check if need to run this query or not.
                 foreach ($data['cms_menu'] as $menu) {
@@ -196,6 +197,16 @@ class CrudboosterSynController extends Controller
                         ]);
                     }
                 }
+
+                // Update the Auto Increment value for pgsql
+                if ($database_connection == "pgsql") {
+                    DB::statement("SELECT setval('cms_menus_id_seq', COALESCE((SELECT MAX(id)+1 FROM cms_menus), 1), false)");
+                    DB::statement("SELECT setval('cms_menus_privileges_id_seq', COALESCE((SELECT MAX(id)+1 FROM cms_menus_privileges), 1), false)");
+                    DB::statement("SELECT setval('cms_moduls_id_seq', COALESCE((SELECT MAX(id)+1 FROM cms_moduls), 1), false)");
+                    DB::statement("SELECT setval('cms_privileges_id_seq', COALESCE((SELECT MAX(id)+1 FROM cms_privileges), 1), false)");
+                    DB::statement("SELECT setval('cms_privileges_roles_id_seq', COALESCE((SELECT MAX(id)+1 FROM cms_privileges_roles), 1), false)");
+                }
+
                 DB::commit();
 
                 return redirect()->route('crudboostersync')->with('message', 'Synced to database successfully');
